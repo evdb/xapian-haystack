@@ -148,6 +148,7 @@ class XapianSearchBackend(BaseSearchBackend):
             os.makedirs(self.path)
         
         self.flags = connection_options.get('FLAGS', DEFAULT_XAPIAN_FLAGS)
+        self.weighting_scheme = connection_options.get('WEIGHTING_SCHEME', None)
         self.language = language
         self._schema = None
         self._content_field_name = None
@@ -397,8 +398,8 @@ class XapianSearchBackend(BaseSearchBackend):
                 )
         
         enquire = xapian.Enquire(database)
-        if hasattr(settings, 'HAYSTACK_XAPIAN_WEIGHTING_SCHEME'):
-            enquire.set_weighting_scheme(xapian.BM25Weight(*settings.HAYSTACK_XAPIAN_WEIGHTING_SCHEME))
+        if self.weighting_scheme:
+            enquire.set_weighting_scheme(xapian.BM25Weight(*self.weighting_scheme))
         enquire.set_query(query)
         
         if sort_by:
